@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from typing import List
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -11,6 +12,17 @@ class TextRequest(BaseModel):
 
 class BatchTextRequest(BaseModel):
     texts: List[str]
+    
+@app.get("/health")
+def health():
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "UP",
+            "service": "local-transformer",
+            "message": "Service is healthy"
+        }
+    )
 
 @app.post("/embed")
 def embed(req: TextRequest):
