@@ -10,3 +10,5 @@ __pycache__/
 
 # Model cache (optional but recommended)
 .cache/
+
+.env
