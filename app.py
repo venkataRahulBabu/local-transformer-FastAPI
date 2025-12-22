@@ -50,14 +50,18 @@ def health():
 
 # -------------------- HF Call --------------------
 
-def call_hf_embeddings(inputs):
+def call_hf_embeddings(texts: List[str]):
     logger.info("Calling Hugging Face embeddings API")
+
+    payload = {
+        "inputs": texts   # ALWAYS list
+    }
 
     try:
         response = requests.post(
             HF_MODEL_URL,
             headers=HEADERS,
-            json={"inputs": inputs},
+            json=payload,
             timeout=60
         )
     except requests.RequestException as e:
@@ -69,17 +73,13 @@ def call_hf_embeddings(inputs):
 
     logger.info(f"HF response status: {response.status_code}")
 
-    # HF cold start
     if response.status_code == 503:
-        logger.warning(f"HF model loading: {response.text}")
         raise HTTPException(
             status_code=503,
             detail="Hugging Face model is loading. Retry shortly."
         )
 
-    # Invalid token
     if response.status_code == 401:
-        logger.error("Invalid Hugging Face API key")
         raise HTTPException(
             status_code=500,
             detail="Invalid Hugging Face API key"
@@ -98,8 +98,8 @@ def call_hf_embeddings(inputs):
 
 @app.post("/embed")
 def embed(req: TextRequest):
-    embedding = call_hf_embeddings(req.text)
-    return {"embedding": embedding}
+    embeddings = call_hf_embeddings([req.text])  # wrap in list
+    return {"embedding": embeddings[0]}          # unwrap single vector
 
 @app.post("/embed/batch")
 def embed_batch(req: BatchTextRequest):
