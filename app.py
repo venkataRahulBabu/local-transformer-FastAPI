@@ -26,14 +26,14 @@ class BatchTextRequest(BaseModel):
     texts: List[str]
 
 # Endpoint to check the status of the service.
-@app.get("/health")
-def health():
+@app.get("/")
+def read_root():
     return JSONResponse(
         status_code=200,
         content={
             "status": "UP",
-            "service": "hf-transformer",
-            "message": "Service is healthy"
+            "service": "embedding-service",
+            "message": "Embedding Service is running n healthy. Use /embed endpoint!"
         }
     )
 
