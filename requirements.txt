@@ -3,3 +3,4 @@ uvicorn
 huggingface_hub
 pydantic
 python-dotenv
+numpy
